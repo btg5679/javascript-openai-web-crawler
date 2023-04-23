@@ -1,0 +1,4 @@
+node_modules
+.env
+crawled_urls.csv
+contents.csv
