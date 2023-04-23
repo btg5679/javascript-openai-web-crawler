@@ -30,7 +30,8 @@ This repository contains a JavaScript script that crawls any domain and uses Ope
 1. Clone the repository
 2. Install dependencies using `npm install`
 3. Set your OpenAI API key in a `.env` file - `OPENAI_API_KEY=123456`
-4. Run the script with a question as a command line argument, like this:
+4. Set your target url in index.js: `const domain = "openai.com";`
+5. Run the script with a question as a command line argument, like this:
 
 ```sh
 node index.js "What is ChatGPT?"
