@@ -1,4 +1,4 @@
-# AI-powered Web Crawler & Content-based Q&A System using OpenAI
+#AI-powered Web Crawler & Content-based Q&A System using OpenAI
 
 This repository contains a JavaScript script that crawls any domain and uses OpenAI API's to answer questions based on the crawled content. The script utilizes OpenAI's Codex and Embedding models to analyze the text, identify relevant tokens, and calculate similarity scores to answer user's questions.
 
