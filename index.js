@@ -21,8 +21,8 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-const domain = "ai-wiki.fintakers.com";
-const fullUrl = "https://ai-wiki.fintakers.com";
+const domain = "lunarmail.io";
+const fullUrl = "https://lunarmail.io";
 
 class HyperlinkParser {
   constructor() {
@@ -402,7 +402,6 @@ function stripHtmlTags(htmlContent) {
 }
 
 async function main() {
-  console.log(process.env.OPENAI_API_KEY);
 
   console.log("starting main...");
   let crawledData = { contents: {} };
