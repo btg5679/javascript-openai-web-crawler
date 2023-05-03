@@ -22,7 +22,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const domain = "lunarmail.io";
-const fullUrl = "https://lunarmail.io/";
+const fullUrl = "https://lunarmail.io";
 
 class HyperlinkParser {
   constructor() {
@@ -170,7 +170,19 @@ async function getRelevantTokens(tokens) {
   console.log("start getRelevantTokens");
   const tokenString = typeof tokens === "string" ? tokens : tokens.join(" ");
   // Prepare the prompt for OpenAI's Codex
-  const prompt = `Given the following tokenized text, identify the most relevant tokens:\n\n${tokenString}\n\nRelevant tokens:`;
+  const promptStart = `Given the following tokenized text, identify the most relevant tokens:\n\n`;
+  const promptEnd = `\n\nRelevant tokens:`;
+
+  // calculate the tokens available for the actual content
+  const availableTokens = 4096 - promptStart.length - promptEnd.length;
+  
+  let prompt;
+  if (tokenString.length > availableTokens) {
+    // cut the string to fit available tokens
+    prompt = promptStart + tokenString.slice(0, availableTokens) + promptEnd;
+  } else {
+    prompt = promptStart + tokenString + promptEnd;
+  }
 
   // Call the OpenAI API
   let response;
@@ -340,7 +352,16 @@ async function answerQuestion(inputText, crawledData) {
   const strippedContent = stripHtmlTags(htmlContent);
 
   // Prepare the prompt for OpenAI's Codex
-  const prompt = `Answer the question based on the context below, and if the question can't be answered based on the context, say "I don't know"\n\nContext: ${strippedContent}\n\n---\n\nQuestion: ${inputText}\nAnswer:`;
+  const promptStart = `Answer the question based on the context below, and if the question can't be answered based on the context, say "I don't know"\n\nContext: ${strippedContent}\n\n---\n\nQuestion: ${inputText}\nAnswer:`;
+  const availableTokens = 4096 - promptStart.length;
+  
+  let prompt;
+  if (strippedContent.length > availableTokens) {
+    // cut the string to fit available tokens
+    prompt = `Answer the question based on the context below, and if the question can't be answered based on the context, say "I don't know"\n\nContext: ${strippedContent.slice(0, availableTokens)}\n\n---\n\nQuestion: ${inputText}\nAnswer:`;
+  } else {
+    prompt = promptStart;
+  }
 
   // Call the OpenAI API
   let apiResponse;
@@ -364,9 +385,10 @@ async function answerQuestion(inputText, crawledData) {
 
   console.log("finish answerQuestion");
   // Extract and return the answer from the response
-  const answer = apiResponse?.data?.choices[0].text.trim();
+  const answer = apiResponse?.data?.choices[0]?.text?.trim();
   return answer;
 }
+
 
 function stripHtmlTags(htmlContent) {
   // Regular expression to match HTML tags and other irrelevant content
@@ -380,6 +402,7 @@ function stripHtmlTags(htmlContent) {
 }
 
 async function main() {
+
   console.log("starting main...");
   let crawledData = { contents: {} };
   const crawledUrlsOutputPath = path.join(process.cwd(), "crawled_urls.csv");
